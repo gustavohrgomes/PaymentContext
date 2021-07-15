@@ -26,7 +26,7 @@ namespace PaymentContext.Domain.Entities
         public Address Address { get; private set; }
         public IReadOnlyCollection<Subscription> Subscriptions { get { return _subscriptions.ToArray(); } }
 
-        public void AddSubscritpion(Subscription subscription)
+        public void AddSubscription(Subscription subscription)
         {
             var hasSubscriptionActive = false;
             foreach (var sub in _subscriptions)
@@ -38,7 +38,11 @@ namespace PaymentContext.Domain.Entities
             AddNotifications(new Contract()
                 .Requires()
                 .IsFalse(hasSubscriptionActive, "Student.Subscriptions", "Você já tem uma assinatura ativa")
+                .AreNotEquals(0, subscription.Payments.Count, "Student.Subscription.Payments", "Esta assinatura não possui pagamentos")
             );
+
+            if (Valid)
+                _subscriptions.Add(subscription);
         }
     }
 }
